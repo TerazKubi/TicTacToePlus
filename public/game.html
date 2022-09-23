@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kółko Krzyżyk</title>
+    <link rel="stylesheet" href="/css/lobby.css">
+    <link rel="stylesheet" href="/css/game.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qs/6.10.1/qs.min.js" 
+        integrity="sha512-aTKlYRb1QfU1jlF3k+aS4AqTpnTXci4R79mkdie/bp6Xm51O5O3ESAYhvg6zoicj/PD6VYY0XrYwsWLcvGiKZQ==" 
+        crossorigin="anonymous" 
+        referrerpolicy="no-referrer">
+        defer
+    </script>
+    <script src="/socket.io/socket.io.js" defer></script>
+    <script src="/js/lobby.js" defer></script>
+    <script src="/js/game.js" defer></script>
+</head>
+<body>
+    <div class="mainContainer">
+        <div class="users">
+            <div class="graczeNapis">
+                <div class="imgUserIcon"><img src="/images/usersIcon.png"></div>
+                <div class="napis">Players</div>
+            </div>
+            <div class="graczeList"></div>
+        </div>
+
+        <div class="games">
+            
+        </div>
+        
+        <input type="button" class="newRoomButton" value="New room">
+        
+        
+        
+    </div>
+    
+    <div id="createRoomBoxContainer" class="hiddenBox displayNone">
+        <div class="hiddenBoxFlexContainer">
+            <span>Room name:</span>
+            <input type="text"  id="roomNameInput">
+            <span>Password:</span>
+            <input type="text" id="roomPassword">
+            <input type="button" value="Create" id="createRoomButton">
+        </div>
+    </div>
+
+    <div id="joinRoomContainer" class="hiddenBox displayNone">
+        <div class="hiddenBoxFlexContainer">
+            <span>Enter password:</span>
+            <input type="text" id="inputRoomPassword">
+            <input type="button" value="Join" id="joinRoomWithPasswordButton">
+        </div>       
+    </div>
+
+
+
+    <div class="roomContainer">
+        <div class="roomBackground">
+            <div class="windowContainer">
+                <div class="chatContainer"></div>
+                <div class="gameContainer"></div>
+                <button id="ready">Ready</button>
+            </div>
+        </div>
+    </div>
+    
+
+    
+    
+</body>
+</html>

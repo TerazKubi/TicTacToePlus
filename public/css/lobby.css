@@ -1,0 +1,175 @@
+body{
+    background-color: rgb(194, 188, 224);
+    width: 100%;
+    height: 100%;
+}
+.mainContainer{
+    width:800px;
+    height:400px;
+    background-color: rgb(122, 104, 201);
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 50px;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 50px;
+    padding-bottom: 50px;
+    position: relative;
+
+
+    
+    
+    
+    
+}
+.games{
+    float: left;
+    width:580px;
+    height: 400px;
+    background-color: white;
+
+
+    
+}
+.room{
+    width:570px;
+    height:60px;
+    border-bottom: 1px solid silver;
+    padding-left: 10px;
+    position: relative;
+
+    
+
+}
+.roomName{
+    width:400px;
+    height:40px;
+    font-size: 30px;
+    text-align: left;
+}
+.playersInRoom{
+    width:400px;
+    height:20px;
+    font-size: 15px;
+    text-align: left;
+    color:silver;
+}
+.joinButton{
+    box-sizing: border-box;
+    width:60px;
+    height:25px;
+    background-color: rgb(122, 104, 201);
+    
+    font-size:20px;
+    color:white;
+    position: absolute;
+    right:20px;
+    top:17px;   
+    cursor: pointer;
+    border:none;
+    outline: none;
+}
+.joinButton:hover{
+    background-color: rgb(97, 77, 185);
+}
+.newRoomButton{
+    width:100px;
+    height:30px;
+    position: absolute;
+    bottom: 10px;
+    right: 20px;
+    color: white;
+    border: none;
+    outline: none;
+    background-color: rgb(160, 143, 235);
+    text-align: center;
+    font-size: 18px;
+}
+.users{
+    float: left;
+    width:200px;
+    height: 400px;
+    background-color: rgb(160, 143, 235);
+    margin-right:20px;
+
+    
+}
+.graczeNapis{
+    padding-top: 2px;
+    width:150px;
+    height: 35px;
+    
+    color:white;
+    
+    background-color: rgb(95, 72, 194);
+    margin-left:25px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    border-radius: 2px;
+
+    
+}
+.imgUserIcon{
+    float: left;
+    margin-left: 13px;
+    margin-right: 5px;
+}
+.napis{
+    float: left;
+    text-align: center;
+    font-size: 30px;
+}
+.graczeList{
+    width:190px;
+    height: 347px;
+    padding-left:10px;
+    
+    color:white;
+    font-size:20px;
+
+    overflow-x: hidden;
+    overflow-y: auto;
+    
+}
+.gracz{
+    width:190px;
+    float:left;
+    height:30px;
+}
+.graczeList::-webkit-scrollbar{
+    width:5px;
+}
+.graczeList::-webkit-scrollbar-track{
+    border-radius:4px;
+}
+.graczeList::-webkit-scrollbar-thumb{
+    background: silver;
+    border-radius: 4px;;
+}
+.graczeList::-webkit-scrollbar-thumb:hover{
+    background: rgb(177, 177, 177);
+}
+.hiddenBox{
+    background-color: antiquewhite;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    height: 300px;
+    display: none;
+    
+    
+}
+.hiddenBoxFlexContainer{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+.displayNone {
+    display: none;
+}
+.displayBlock{
+    display: block;
+}
