@@ -10,7 +10,8 @@ const server = app.listen(PORT, ()=>{
 })
 
 const { getAllUsers, joinLobby, userLeave, getUserById } = require('./utils/users')
-const { createRoom, getRooms, joinRoom, getRoomByUserId, userLeaveRoom, setRoomStatus, resetGameBoard, setReadyUser, setRandomMarks } = require('./utils/rooms')
+const { createRoom, getRooms, joinRoom, getRoomByUserId, userLeaveRoom,
+        resetGameBoard, setReadyUser, setRandomMarks, chooseStartingPlayer, switchTurns, insertMoveToBoard, checkWin, resetRoom, getWinNodes, deleteRoom } = require('./utils/rooms')
 
 
 app.use(express.static('public'));
@@ -20,13 +21,15 @@ const io = require('socket.io')(server)
 
 
 io.on("connection", (socket) => {
-    console.log("CONNECTED: " + socket.id)
+    // console.log("CONNECTED: " + socket.id)
 
     socket.on('joinLobby', (userName) => {
         console.log("LOBBY JOINED", userName, socket.id)
         const user = joinLobby(socket.id, userName)
         const users = getAllUsers()
         const rooms = getRooms()
+
+        console.log("LOBBY JOIN: ", users, rooms)
 
         socket.emit('userInfo', user)
         io.emit('lobbyInfo', [users,  rooms])
@@ -44,7 +47,7 @@ io.on("connection", (socket) => {
         const rooms = getRooms()
         io.emit("lobbyInfo", [users, rooms])
 
-        //console.log(socket.rooms)
+        console.log("room joined")
         console.log(getRooms())
     })
 
@@ -57,7 +60,7 @@ io.on("connection", (socket) => {
         // console.log(room)
         socket.join(roomId)
         
-
+        console.log("room created")
         socket.emit("joinRoom", room)
         const rooms = getRooms()
         const users = getAllUsers()
@@ -68,9 +71,35 @@ io.on("connection", (socket) => {
 
 
     socket.on('insertMoveToBoard', ([i, j, user]) => {
-        console.log("usermademove")
-        console.log(i, j, user)
+        // console.log("usermademove")
+        // console.log(i, j, user)
+        let room = getRoomByUserId(user.userId)
+        room = insertMoveToBoard(room.roomId, i, j, user.userId)
+        if ( checkWin(room.board) ) {
+            // user.userId user that WON
+            const winNodes = getWinNodes(room.board)
+            io.to(room.roomId).emit('gameover', [room, user, winNodes])
+            room = resetRoom(room.roomId)
+
+            console.log('WIN')
+            return
+        }
+        // console.log("not yet win")
+        room = switchTurns(room.roomId)
+        // console.log("BIG WIN")
+        // console.log(checkWin(room.board))
+        // console.log("SMALL WINS")
+        // room.board.forEach(smallBoard => {
+        //     console.log(checkWin(smallBoard))
+        // })
+        if(Array.isArray(room.board[j])){
+            io.to(room.roomId).emit('nextTurn', [room, j])
+        } else {
+            io.to(room.roomId).emit('nextTurn', [room])
+        }
     })
+
+
     socket.on('setReady', user => {
         const u = setReadyUser(user.userId)
         
@@ -82,37 +111,64 @@ io.on("connection", (socket) => {
             if (!user.ready) isAllReady = false
         });
         if (isAllReady) {
-            io.to(room.roomId).emit('gameStart', room)
-            room = setRoomStatus(room.roomId, 'playing')
             room = setRandomMarks(room.roomId)
-            getRooms().forEach(r => {
-                console.log(r.usersInRoom)
-            })
+            room = chooseStartingPlayer(room.roomId)
+            // getRooms().forEach(r => {
+            //     console.log(r.usersInRoom)
+            // })
+            console.log("game starts")
+            io.to(room.roomId).emit('gameStart', room)
         }
     }) 
 
-    
+    socket.on('leaveRoom', userId => {
+        const user = getUserById(userId)
+        let room = getRoomByUserId(user.userId)
+        if(room) {
+            room = userLeaveRoom(room.roomId, user.userId)
+            if ( room.usersInRoom.length === 0) {
+                let rooms = deleteRoom(room.roomId)
+            } else {
+                console.log('updateUsers in room')
+                room = resetGameBoard(room.roomId)
+                socket.to(room.roomId).emit('updateUsersInGameRoom', room)
+            }            
+        }
+        //console.log(room)
+        const rooms = getRooms()
+        const users = getAllUsers()
+        
+        console.log("some users left some room")
+        socket.emit('roomLeft')
+        io.emit("lobbyInfo", [users, rooms])
+    })
 
     socket.on('disconnect', () => {
-        const user = userLeave(socket.id)
-        const users = getAllUsers()
-
-        if(!user) return
-        console.log(user.userName + " DISCONNECTED")
-
-        //console.log(users)
+        let user = getUserById(socket.id)
+        //const user = userLeave(socket.id)
         
 
-        //check if user was in room and remove him
-        let room = getRoomByUserId(user.userId)
-        const userl = userLeaveRoom(room.roomId, user.userId)
-        if(userl) {
-            socket.to(room.roomId).emit('updateUsersInGameRoom', room)
-            room = setRoomStatus(room.roomId, "waiting")
-            room = resetGameBoard(room.roomId)
+        if(user) {
+            console.log(user.userName + " DISCONNECTED")
+            let users = userLeave(user.userId)
+            var room = getRoomByUserId(user.userId)
         }
-        console.log(room)
+
+        if(room) {
+            room = userLeaveRoom(room.roomId, user.userId)
+            if ( room.usersInRoom.length === 0) {
+                let rooms = deleteRoom(room.roomId)
+            } else {
+                console.log('updateUsers in room')
+                socket.to(room.roomId).emit('updateUsersInGameRoom', room)
+                room = resetGameBoard(room.roomId)
+            }            
+        }
+        //console.log(room)
         const rooms = getRooms()
+        const users = getAllUsers()
+        //console.log("AFTER DISCONNECT", rooms, users)
+        console.log("AFTER DISCONNECT")
         io.emit("lobbyInfo", [users, rooms])
     })
 })

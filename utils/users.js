@@ -9,7 +9,8 @@ function joinLobby(userId, userName) {
         userId,
         userName,
         ready: false,
-        mark: ''
+        mark: '',
+        yourTurn: false
     }
     users.push(user)
 

@@ -38,6 +38,8 @@
         
     </div>
     
+    <div class="bluredBackground displayNone"></div>
+
     <div id="createRoomBoxContainer" class="hiddenBox displayNone">
         <div class="hiddenBoxFlexContainer">
             <span>Room name:</span>
@@ -58,14 +60,42 @@
 
 
 
-    <div class="roomContainer">
+    <div class="roomContainer displayNone">
         <div class="roomBackground">
+            <div class="leaveRoomButton">LEAVE</div>
             <div class="windowContainer">
-                <div class="chatContainer"></div>
+                
+                <div class="leftContainer">
+                    <div class="card displayNone" id="leftCard">
+                        <div class="bubble displayNone">
+                            Your turn
+                            <div class="triangle"></div>
+                        </div>
+                        
+                        <div class="littleName"></div>
+                        <div class="name"></div>
+                        <div class="markContainer"></div>
+                    </div>
+                </div>
                 <div class="gameContainer"></div>
+
+                <div class="rightContainer">
+                    <div class="card displayNone" id="rightCard">
+                        <div class="bubble displayNone">
+                            Opponent's turn
+                            <div class="triangle"></div>
+                        </div>
+                        
+                        <div class="littleName"></div>
+                        <div class="name">Siema</div>
+                        <div class="markContainer"></div>
+                    </div>
+                </div>
+                
                 <button id="ready">Ready</button>
             </div>
         </div>
+        
     </div>
     
 

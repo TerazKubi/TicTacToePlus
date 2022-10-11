@@ -1,59 +1,221 @@
 
+const marksClassNames = {
+    x: "mark-X",
+    o: "mark-O",
+    '': 'no-mark'
+    
+}
+
 socket.on('updateUsersInGameRoom', (room) => {
     updateUsersInGameRoom(room)
 })
 
 socket.on('gameStart', (room) => {
-    console.log("game start")
-    drawBoard(room.board)
+    console.log('gamestart', user)
+    updateUsersInGameRoom(room)
+    drawBoard(room, user.userId)
 })
 
+socket.on('nextTurn', ([room, target]) => {
+    //console.log(room)
+    console.log(target)
+    drawBoard(room, user.userId, target)
+})
 
+socket.on('gameover', ([room, userWinner, winNodes]) => {
+    drawBoardAfterWin(room, userWinner, winNodes)
+    hideMarksAndBubbles(leftCard, rightCard)
+})
+
+socket.on('roomLeft', () => {
+    hideElement(roomContainer)
+})
 
 function showGameRoom(room) {
-    const chatContainer = document.querySelector('.chatContainer')
-    
-    room.usersInRoom.forEach(user => {
-        chatContainer.innerHTML += user.userName + "<br/>"
-    });
+    showElement(roomContainer)
+    updateUsersInGameRoom(room)
    
-
-    roomContainer.style.display = "block"
     console.log("ROOM RENDERED", room)
 }
 
+
 function updateUsersInGameRoom(room) {
-    const chatContainer = document.querySelector('.chatContainer')
-    chatContainer.innerHTML = ""
-    room.usersInRoom.forEach(user => {
-        chatContainer.innerHTML += user.userName + "<br/>"
-    });
+    console.log("update users in room", room)
+
+    hideMarksAndBubbles(leftCard, rightCard)
+    hideElement(leftCard)
+    hideElement(rightCard)
+
+    room.usersInRoom.forEach(u => {
+        console.log(u)
+        if (u.userId === user.userId) {
+
+            showElement(leftCard)
+            leftCard.querySelector('.name').innerText = u.userName
+            leftCard.querySelector('.littleName').innerHTML = "<span>" + u.userName.slice(0, 2) + "</span>"
+            if (u.mark !== "") leftCard.querySelector('.markContainer').classList.add(marksClassNames[u.mark])
+        } else {
+            showElement(rightCard)
+            rightCard.querySelector('.name').innerText = u.userName
+            rightCard.querySelector('.littleName').innerHTML = "<span>" + u.userName.slice(0, 2) + "</span>"
+            if (u.mark !== "") rightCard.querySelector('.markContainer').classList.add(marksClassNames[u.mark])
+        }
+    })
 }
 
-function drawBoard(board){
+function drawBoard(room, userId, target=null){
     const gameContainer = document.querySelector('.gameContainer')
-
-    board.forEach((bigNode, i) => {
-        const newBigNode = document.createElement('div')
-        newBigNode.classList.add('bigNode')
-        bigNode.forEach((smallNode, j) => {
-            const newSmallNode = document.createElement('div')
-            newSmallNode.classList.add('smallNode')
-            newSmallNode.addEventListener("click", (e) => {
-                clickOnNode(i, j)
-                e.stopPropagation()
-            })
-            newSmallNode.innerHTML = smallNode
-            newBigNode.appendChild(newSmallNode)
-        })
-        // for(let j = 0; j < 9; j++) {
-        //     newBigNode.innerHTML += "<div class='SmallNode' onclick='clickOnNode("+i+","+j+")'></div>"
-        // }
-        gameContainer.append(newBigNode)
-    })
+    gameContainer.innerHTML = ''
+    const board = room.board
+    const user = room.usersInRoom.find(u => u.userId === userId)
+    
+    //console.log(board)
+    console.table(board)
+    
+    
+    console.log(user)
+    if (user.yourTurn) {
+        drawBoardMyTurn(gameContainer, board, target)
+        
+    } else {
+        console.log('drwboard enemy turn')
+        drawBoardEnemyTurn(gameContainer, board)
+        
+    }
+    showTurn(user.yourTurn)
 }
 
 function clickOnNode(i, j) {
     console.log(i, j)
     socket.emit('insertMoveToBoard', [i, j, user])
+}
+
+function drawBoardEnemyTurn(gameContainer, board) {
+    console.log('from functin draw eneym turn')
+
+    for (let i = 0; i < board.length; i++) {
+        
+        const newBigNode = document.createElement('div')
+        newBigNode.classList.add('bigNode')
+        
+        
+        if( !Array.isArray(board[i]) ) {
+            console.log('from check 1')
+            newBigNode.classList.add(marksClassNames[board[i]])
+            gameContainer.append(newBigNode)
+            continue
+        }
+        
+        for (let j = 0; j < board[i].length; j++) {
+            
+            const newSmallNode = document.createElement('div')
+            newSmallNode.classList.add('smallNode')
+            newSmallNode.classList.add(marksClassNames[board[i][j]])
+                      
+            newBigNode.appendChild(newSmallNode)
+            
+        }
+        
+        gameContainer.append(newBigNode)
+    }
+}
+
+function drawBoardMyTurn(gameContainer, board, target=null){
+    
+
+    for (let i = 0; i < board.length; i++) {
+        const newBigNode = document.createElement('div')
+        newBigNode.classList.add('bigNode')
+
+        if( !Array.isArray(board[i]) ) {
+            newBigNode.classList.add(marksClassNames[board[i]])
+            gameContainer.append(newBigNode)
+            
+            continue
+        }
+        
+        if( target === null || target === i ) {
+            newBigNode.classList.add('target')
+        } 
+
+        for (let j = 0; j < board[i].length; j++) {
+            const newSmallNode = document.createElement('div')
+            newSmallNode.classList.add('smallNode')
+            newSmallNode.classList.add(marksClassNames[board[i][j]])
+            newBigNode.appendChild(newSmallNode)
+            
+            
+            // no target you can click all
+            if(target === null ) {
+
+                newSmallNode.addEventListener("click", (e) => {
+                    e.stopPropagation()
+                    clickOnNode(i, j)
+                })
+                
+            } 
+            // target
+            else if ( target === i ) {
+                newSmallNode.addEventListener("click", (e) => {
+                    e.stopPropagation()
+                    clickOnNode(i, j)
+                })
+            }
+                  
+        }
+
+        gameContainer.append(newBigNode)
+    }
+}
+
+function drawBoardAfterWin(room, userWinner, winNodes) {
+    const gameContainer = document.querySelector('.gameContainer')
+    const board = room.board
+
+    gameContainer.innerHTML = ''
+
+    for (let i = 0; i < board.length; i++) {
+        const newBigNode = document.createElement('div')
+        newBigNode.classList.add('bigNode')
+
+        if( !Array.isArray(board[i]) ) {
+            newBigNode.classList.add(marksClassNames[board[i]])
+            if (winNodes.includes(i) ) {
+                userWinner.userId === user.userId ?  newBigNode.classList.add('winNode') : newBigNode.classList.add('loseNode')
+            } 
+            gameContainer.append(newBigNode)
+            continue
+        }
+        
+        for (let j = 0; j < board[i].length; j++) {
+            const newSmallNode = document.createElement('div')
+            newSmallNode.classList.add('smallNode')
+            newSmallNode.classList.add(marksClassNames[board[i][j]])           
+            newBigNode.appendChild(newSmallNode)
+            
+        }
+
+        gameContainer.append(newBigNode)
+    }
+}
+
+function showTurn(isMyTurn) {
+    if (isMyTurn) {
+        hideElement(rightCardBubble)
+        showElement(leftCardBubble)
+        leftCard.style.border = '2px solid orange'
+        rightCard.style.border = '2px solid white'
+    } else {
+        hideElement(leftCardBubble)
+        showElement(rightCardBubble)
+        rightCard.style.border = '2px solid orange'
+        leftCard.style.border = '2px solid white'
+    }
+}
+
+function hideMarksAndBubbles(left, right) {
+    left.querySelector('.markContainer').classList.remove(marksClassNames['x'])
+    left.querySelector('.markContainer').classList.remove(marksClassNames['o'])
+    right.querySelector('.markContainer').classList.remove(marksClassNames['x'])
+    right.querySelector('.markContainer').classList.remove(marksClassNames['o'])
 }

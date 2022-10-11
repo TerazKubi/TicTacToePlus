@@ -1,0 +1,9 @@
+better UI desing for everything
+
+wyjscie z gierki podczas grania i powrot do pokoju nie resetuje gierki
+
+po wyjsciu kogos z pokoju reset isReady 
+chowanie guzika READY
+reset guzika po wyjsiu kogos z pokoju
+
+po skonczonej gierce guzik ready zmienia tekst na REWANZ (albo cos tego typu)

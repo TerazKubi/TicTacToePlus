@@ -1,5 +1,5 @@
 body {
-  background-color: #7a68c9;
+  background-color: #4a17a5;
 }
 
 .title {
@@ -7,7 +7,7 @@ body {
   margin-left: auto;
   margin-right: auto;
   font-size: 30px;
-  color: white;
+  color: #4717F6;
   text-align: center;
   margin-bottom: 20px;
   margin-top: 40px;
@@ -16,10 +16,11 @@ body {
 .main {
   width: 500px;
   height: 150px;
-  background-color: white;
+  background-color: #E7DFDD;
   margin-left: auto;
   margin-right: auto;
   padding: 20px;
+  border-radius: 10px;
 }
 
 .main .formContainer {
@@ -47,24 +48,26 @@ body {
   background-color: #dbdbdb;
   box-sizing: border-box;
   font-size: 20px;
+  border-radius: 5px;
 }
 
 .main .formContainer .button {
   width: 330px;
   height: 40px;
-  background-color: #7a68c9;
+  background-color: #4717F6;
   border: none;
   outline: none;
   color: white;
   font-size: 20px;
+  border-radius: 5px;
 }
 
 .main .formContainer .button:hover {
-  background-color: #6351b4;
+  background-color: #3e14d6;
 }
 
 .main .logoContainer {
-  background-color: #7a68c9;
+  background-color: #4717F6;
   float: left;
-  border: 10px solid #7a68c9;
+  border: 10px solid #4717F6;
 }

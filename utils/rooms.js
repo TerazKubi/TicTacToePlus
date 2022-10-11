@@ -1,3 +1,5 @@
+const e = require("express")
+
 const rooms = []
 
 function createRoom(roomName, roomPassword, roomId) {
@@ -13,6 +15,13 @@ function createRoom(roomName, roomPassword, roomId) {
     rooms.push(room)
 
     return room
+}
+
+function deleteRoom( roomId ) {
+    const index = rooms.findIndex(room => room.roomId === roomId)
+    if(index !== -1){
+        return rooms.splice(index, 1)[0]
+    }
 }
 
 function getRooms() {
@@ -32,7 +41,8 @@ function userLeaveRoom(roomId, userId) {
     const room = getRoomById(roomId)
     const index = room.usersInRoom.findIndex(user => user.userId === userId)
     if(index !== -1){
-        return room.usersInRoom.splice(index, 1)[0]
+        room.usersInRoom.splice(index, 1)[0]
+        return room
     }
 }
 
@@ -43,11 +53,6 @@ function getRoomByUserId(userId) {
     return rooms.find(room => room.usersInRoom.find(user => user.userId === userId))
 }
 
-function setRoomStatus(roomId, status) {
-    const room = getRoomById(roomId)
-    room.status = status
-    return room
-}
 
 function createBoard() {
     const board = []
@@ -83,14 +88,111 @@ function setRandomMarks(roomId) {
     return room
 }
 
+function chooseStartingPlayer(roomId){
+    const room = getRoomById(roomId)
+    room.usersInRoom[Math.floor(Math.random() * 2)].yourTurn = true
+
+    return room
+}
+function insertMoveToBoard(roomId, i, j, userId) {
+    const room = getRoomById(roomId)
+    const user = getUserFromRoom(userId, roomId)
+    // console.log('FROM ROOMS')
+    // console.log(room)
+    // console.log("user mark ", user.mark)
+    room.board[i][j] = user.mark
+    for (let i = 0; i < room.board.length; i++) {
+        // console.log(checkWin(room.board[i]))
+        if (checkWin(room.board[i]) && room.board[i] !== 'x' && room.board[i] !== 'o') room.board[i] = user.mark
+        
+    }
+    
+    return room
+}
+function switchTurns(roomId){
+    const room = getRoomById(roomId)
+    if(room.usersInRoom[0].yourTurn) {
+        room.usersInRoom[0].yourTurn = false
+        room.usersInRoom[1].yourTurn = true
+    } else {
+        room.usersInRoom[0].yourTurn = true
+        room.usersInRoom[1].yourTurn = false
+    }
+    return room
+}
+
+function resetRoom(roomId) {
+    const room = getRoomById(roomId)
+    room.usersInRoom[0].yourTurn = false
+    room.usersInRoom[1].yourTurn = false
+    room.usersInRoom[0].ready = false
+    room.usersInRoom[1].ready = false
+    room.usersInRoom[0].mark = ''
+    room.usersInRoom[1].mark = ''
+    room.board = createBoard()
+    return room
+}
+
+function getUserFromRoom(userId, roomId) {
+    const room = getRoomById(roomId)
+    return room.usersInRoom.find(user => user.userId === userId)
+}
+
+function checkWin(board) {
+    if(board[0]==board[1] && board[1]==board[2] && board[0]!=''){        
+        return true
+    }else if(board[3]==board[4] && board[4]==board[5] && board[3]!=''){ 
+        return true
+    }else if(board[6]==board[7] && board[7]==board[8] && board[6]!=''){  
+        return true
+    }else if(board[0]==board[3] && board[3]==board[6] && board[0]!=''){  
+        return true
+    }else if(board[1]==board[4] && board[4]==board[7] && board[1]!=''){  
+        return true
+    }else if(board[2]==board[5] && board[5]==board[8] && board[2]!=''){ 
+        return true
+    }else if(board[0]==board[4] && board[4]==board[8] && board[0]!=''){  
+        return true
+    }else if(board[2]==board[4] && board[4]==board[6] && board[2]!=''){  
+        return true
+    }
+    return false  
+}
+
+function getWinNodes(board) {
+    if(board[0]==board[1] && board[1]==board[2] && board[0]!=''){        
+        return [0,1,2]
+    }else if(board[3]==board[4] && board[4]==board[5] && board[3]!=''){ 
+        return [3,4,5]
+    }else if(board[6]==board[7] && board[7]==board[8] && board[6]!=''){  
+        return [6,7,8]
+    }else if(board[0]==board[3] && board[3]==board[6] && board[0]!=''){  
+        return [0,3,6]
+    }else if(board[1]==board[4] && board[4]==board[7] && board[1]!=''){  
+        return [1,4,7]
+    }else if(board[2]==board[5] && board[5]==board[8] && board[2]!=''){ 
+        return [2,5,8]
+    }else if(board[0]==board[4] && board[4]==board[8] && board[0]!=''){  
+        return [0,4,8]
+    }else if(board[2]==board[4] && board[4]==board[6] && board[2]!=''){  
+        return [2,4,6]
+    }
+}
+
 module.exports = {
     createRoom,
     getRooms,
     joinRoom,
     getRoomByUserId,
     userLeaveRoom,
-    setRoomStatus,
     resetGameBoard,
     setReadyUser,
-    setRandomMarks
+    setRandomMarks,
+    chooseStartingPlayer,
+    switchTurns,
+    insertMoveToBoard,
+    checkWin,
+    resetRoom, 
+    getWinNodes,
+    deleteRoom
 }
