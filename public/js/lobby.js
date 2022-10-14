@@ -38,8 +38,8 @@ newRoomButton.addEventListener("click", ()=>{
     showElement(createRoomBox)
     showElement(bluredBg)
     
-    console.log("siema")
     roomNameInput.value = userName + "'s room"
+    roomPasswordInput.value = ''
     roomPasswordInput.focus()
 })
 createRoomButton.addEventListener("click", () => {
@@ -58,12 +58,7 @@ document.addEventListener("click", e => {
     hideElement(bluredBg)      
     
 })
-readyButton.addEventListener('click', () => {
-    socket.emit("setReady", user)
-})
-leaveRoomButton.addEventListener('click', () => {
-    socket.emit('leaveRoom', user.userId)
-})
+
 
 
 socket.emit('joinLobby', userName)
@@ -80,11 +75,7 @@ socket.on('lobbyInfo', ([users, rooms]) => {
     
 })
 
-socket.on("joinRoom", (room) => {
-   
-    showGameRoom(room)
-    
-})
+
 
 
 

@@ -6,8 +6,20 @@ const marksClassNames = {
     
 }
 
+readyButton.addEventListener('click', () => {
+    socket.emit("setReady", user)
+})
+leaveRoomButton.addEventListener('click', () => {
+    socket.emit('leaveRoom', user.userId)
+})
+
+socket.on("joinRoom", (room) => {  
+    showGameRoom(room)   
+})
+
 socket.on('updateUsersInGameRoom', (room) => {
     updateUsersInGameRoom(room)
+    drawEmptyBoard()
 })
 
 socket.on('gameStart', (room) => {
@@ -17,8 +29,7 @@ socket.on('gameStart', (room) => {
 })
 
 socket.on('nextTurn', ([room, target]) => {
-    //console.log(room)
-    console.log(target)
+
     drawBoard(room, user.userId, target)
 })
 
@@ -31,10 +42,14 @@ socket.on('roomLeft', () => {
     hideElement(roomContainer)
 })
 
+// socket.on('opponentLeftRoom', () => {
+//     drawEmptyBoard()
+// })
+
 function showGameRoom(room) {
     showElement(roomContainer)
     updateUsersInGameRoom(room)
-   
+    drawEmptyBoard()
     console.log("ROOM RENDERED", room)
 }
 
@@ -198,7 +213,24 @@ function drawBoardAfterWin(room, userWinner, winNodes) {
         gameContainer.append(newBigNode)
     }
 }
+function drawEmptyBoard() {
+    const gameContainer = document.querySelector('.gameContainer')
+    gameContainer.innerHTML = ''
 
+    for (let i = 0; i < 9; i++) {
+        
+        const newBigNode = document.createElement('div')
+        newBigNode.classList.add('bigNode')
+        
+        for (let j = 0; j < 9; j++) {
+            
+            const newSmallNode = document.createElement('div')
+            newSmallNode.classList.add('smallNode')
+            newBigNode.appendChild(newSmallNode)           
+        }        
+        gameContainer.append(newBigNode)
+    }
+}
 function showTurn(isMyTurn) {
     if (isMyTurn) {
         hideElement(rightCardBubble)
@@ -218,4 +250,8 @@ function hideMarksAndBubbles(left, right) {
     left.querySelector('.markContainer').classList.remove(marksClassNames['o'])
     right.querySelector('.markContainer').classList.remove(marksClassNames['x'])
     right.querySelector('.markContainer').classList.remove(marksClassNames['o'])
+    hideElement(leftCardBubble)
+    hideElement(rightCardBubble)
+    rightCard.style.border = '2px solid white'
+    leftCard.style.border = '2px solid white'
 }

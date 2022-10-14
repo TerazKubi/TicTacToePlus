@@ -19,9 +19,8 @@ function createRoom(roomName, roomPassword, roomId) {
 
 function deleteRoom( roomId ) {
     const index = rooms.findIndex(room => room.roomId === roomId)
-    if(index !== -1){
-        return rooms.splice(index, 1)[0]
-    }
+    if(index !== -1) return rooms.splice(index, 1)[0]
+
 }
 
 function getRooms() {
@@ -40,10 +39,11 @@ function joinRoom(roomId, user) {
 function userLeaveRoom(roomId, userId) {
     const room = getRoomById(roomId)
     const index = room.usersInRoom.findIndex(user => user.userId === userId)
-    if(index !== -1){
+    if(index !== -1) {
         room.usersInRoom.splice(index, 1)[0]
         return room
     }
+    return room
 }
 
 function getRoomById(roomId) {
@@ -97,9 +97,7 @@ function chooseStartingPlayer(roomId){
 function insertMoveToBoard(roomId, i, j, userId) {
     const room = getRoomById(roomId)
     const user = getUserFromRoom(userId, roomId)
-    // console.log('FROM ROOMS')
-    // console.log(room)
-    // console.log("user mark ", user.mark)
+    
     room.board[i][j] = user.mark
     for (let i = 0; i < room.board.length; i++) {
         // console.log(checkWin(room.board[i]))
@@ -123,12 +121,12 @@ function switchTurns(roomId){
 
 function resetRoom(roomId) {
     const room = getRoomById(roomId)
-    room.usersInRoom[0].yourTurn = false
-    room.usersInRoom[1].yourTurn = false
-    room.usersInRoom[0].ready = false
-    room.usersInRoom[1].ready = false
-    room.usersInRoom[0].mark = ''
-    room.usersInRoom[1].mark = ''
+    room.usersInRoom.forEach(user => {
+        user.yourTurn = false
+        user.mark = ''
+        user.ready = false
+    })
+    
     room.board = createBoard()
     return room
 }

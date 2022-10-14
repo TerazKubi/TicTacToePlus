@@ -29,7 +29,7 @@ io.on("connection", (socket) => {
         const users = getAllUsers()
         const rooms = getRooms()
 
-        console.log("LOBBY JOIN: ", users, rooms)
+        //console.log("LOBBY JOIN: ", users, rooms)
 
         socket.emit('userInfo', user)
         io.emit('lobbyInfo', [users,  rooms])
@@ -130,7 +130,7 @@ io.on("connection", (socket) => {
                 let rooms = deleteRoom(room.roomId)
             } else {
                 console.log('updateUsers in room')
-                room = resetGameBoard(room.roomId)
+                room = resetRoom(room.roomId)
                 socket.to(room.roomId).emit('updateUsersInGameRoom', room)
             }            
         }
@@ -156,12 +156,14 @@ io.on("connection", (socket) => {
 
         if(room) {
             room = userLeaveRoom(room.roomId, user.userId)
+            console.log(room)
             if ( room.usersInRoom.length === 0) {
                 let rooms = deleteRoom(room.roomId)
             } else {
                 console.log('updateUsers in room')
+                room = resetRoom(room.roomId)
                 socket.to(room.roomId).emit('updateUsersInGameRoom', room)
-                room = resetGameBoard(room.roomId)
+                //socket.to(room.roomId).emit('opponentLeftRoom')
             }            
         }
         //console.log(room)
